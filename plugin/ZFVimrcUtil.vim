@@ -8,10 +8,6 @@ endif
 
 " ============================================================
 " config
-if !exists('g:ZFVimrcUtil_keymap')
-    let g:ZFVimrcUtil_keymap=1
-endif
-
 if !exists('g:ZFVimrcUtil_vimrc_file')
     let g:ZFVimrcUtil_vimrc_file='zf_vimrc.vim'
 endif
@@ -37,10 +33,6 @@ endfunction
 function! ZF_VimrcEditOrg()
     edit $MYVIMRC
 endfunction
-if g:ZFVimrcUtil_keymap == 1
-    nnoremap <leader>vimrc :call ZF_VimrcEdit()<cr>
-    nnoremap <leader>vimrt :call ZF_VimrcEditOrg()<cr>
-endif
 
 " cleanup vim
 function! ZF_VimClean()
@@ -49,9 +41,6 @@ function! ZF_VimClean()
     let dummy = system('rm -rf "' . $HOME . '/.viminfo"')
     let dummy = system('rm -rf "' . $HOME . '/.vim_cache"')
 endfunction
-if g:ZFVimrcUtil_keymap == 1
-    nnoremap <leader>vimclean :call ZF_VimClean()<cr>
-endif
 
 " diff vimrc
 function! ZF_VimrcDiff()
@@ -68,9 +57,6 @@ function! ZF_VimrcDiff()
     execute ':call ZF_DiffBuffer(' . bufnr1 . ',' . bufnr2 . ')'
     let dummy = system('rm -rf "' . tmp_path . '"')
 endfunction
-if g:ZFVimrcUtil_keymap == 1
-    nnoremap <leader>vimrd :call ZF_VimrcDiff()<cr>
-endif
 
 " update vimrc
 function! ZF_VimrcUpdate()
@@ -99,9 +85,6 @@ function! ZF_VimrcUpdate()
         call ZF_VimrcEdit()
     endif
 endfunction
-if g:ZFVimrcUtil_keymap == 1
-    nnoremap <leader>vimru :call ZF_VimrcUpdate()<cr>
-endif
 
 " commit vimrc
 function! ZF_VimrcPush()
@@ -143,7 +126,4 @@ function! ZF_VimrcPush()
     echo dummy
     let dummy = system('rm -rf "' . tmp_path . '"')
 endfunction
-if g:ZFVimrcUtil_keymap == 1
-    nnoremap <leader>vimrp :call ZF_VimrcPush()<cr>
-endif
 
