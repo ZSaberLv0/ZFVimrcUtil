@@ -25,7 +25,7 @@ let g:ZFVimrcUtil_git_repo=g:ZFVimrcUtil_git_repo_head . g:ZFVimrcUtil_git_repo_
 " ============================================================
 " edit vimrc
 function! ZF_VimrcLoad()
-    execute 'source $HOME/' . g:ZFVimrcUtil_vimrc_file
+    execute 'silent! source $HOME/' . g:ZFVimrcUtil_vimrc_file
 endfunction
 function! ZF_VimrcEdit()
     execute 'edit $HOME/' . g:ZFVimrcUtil_vimrc_file
