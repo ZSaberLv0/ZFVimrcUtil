@@ -80,7 +80,7 @@ function! ZF_VimrcUpdate()
     let dummy = system('rm -rf "' . tmp_path . '"')
     if confirm=='a'
         call ZF_VimrcLoad()
-        execute ':PluginUpdate'
+        execute ':silent! PluginUpdate'
     else
         call ZF_VimrcEdit()
     endif
