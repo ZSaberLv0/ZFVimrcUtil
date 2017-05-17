@@ -83,7 +83,7 @@ function! ZF_VimrcUpdate()
     let dummy = system('git clone ' . g:ZFVimrcUtil_git_repo . ' "' . tmp_path . '"')
     let dummy = system('cp "' . tmp_path . '/' . g:ZFVimrcUtil_vimrc_file . '" "' . $HOME . '/' . g:ZFVimrcUtil_vimrc_file . '"')
     let dummy = system('rm -rf "' . tmp_path . '"')
-    if confirm=='a'
+    if confirm=='a' || confirm=='f'
         call ZF_VimrcLoad()
         execute ':silent! PluginUpdate'
     else
