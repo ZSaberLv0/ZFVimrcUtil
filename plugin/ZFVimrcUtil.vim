@@ -64,11 +64,16 @@ function! ZF_VimrcUpdate()
     echo '  (y)es'
     echo '  (n)o'
     echo '  (a)lso update plugins'
+    echo '  (f)orce update all plugins'
     let confirm=nr2char(getchar())
-    if confirm!='y' && confirm!='a'
+    if confirm!='y' && confirm!='a' && confirm!='f'
         redraw!
         echo 'update canceled'
         return
+    endif
+
+    if confirm=='f'
+        let dummy = system('rm -rf "' . $HOME . '/.vim"')
     endif
 
     redraw!
