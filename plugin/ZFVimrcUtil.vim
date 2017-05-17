@@ -8,6 +8,10 @@ endif
 
 " ============================================================
 " config
+if !exists('g:ZFVimrcUtil_PluginUpdateCmd')
+    let g:ZFVimrcUtil_PluginUpdateCmd='PlugUpdate'
+endif
+
 if !exists('g:ZFVimrcUtil_vimrc_file')
     let g:ZFVimrcUtil_vimrc_file='zf_vimrc.vim'
 endif
@@ -83,9 +87,9 @@ function! ZF_VimrcUpdate()
     let dummy = system('git clone ' . g:ZFVimrcUtil_git_repo . ' "' . tmp_path . '"')
     let dummy = system('cp "' . tmp_path . '/' . g:ZFVimrcUtil_vimrc_file . '" "' . $HOME . '/' . g:ZFVimrcUtil_vimrc_file . '"')
     let dummy = system('rm -rf "' . tmp_path . '"')
-    if confirm=='a' || confirm=='f'
+    if confirm=='a'
         call ZF_VimrcLoad()
-        execute ':silent! PluginUpdate'
+        execute ':silent! ' . g:ZFVimrcUtil_PluginUpdateCmd
     else
         call ZF_VimrcEdit()
     endif
