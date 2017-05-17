@@ -52,7 +52,7 @@ function! ZF_VimrcDiff()
     echo 'updating...'
     let tmp_path = $HOME . '/.vim_cache/_zf_vimrc_tmp_'
     let dummy = system('rm -rf "' . tmp_path . '"')
-    let dummy = system('git clone ' . g:ZFVimrcUtil_git_repo . ' "' . tmp_path . '"')
+    let dummy = system('git clone --depth=1 ' . g:ZFVimrcUtil_git_repo . ' "' . tmp_path . '"')
     execute 'edit ' . tmp_path . '/' . g:ZFVimrcUtil_vimrc_file
     setlocal buftype=nofile
     let bufnr1 = bufnr('%')
@@ -86,7 +86,7 @@ function! ZF_VimrcUpdate()
     echo 'updating...'
     let tmp_path = $HOME . '/.vim_cache/_zf_vimrc_tmp_'
     let dummy = system('rm -rf "' . tmp_path . '"')
-    let dummy = system('git clone ' . g:ZFVimrcUtil_git_repo . ' "' . tmp_path . '"')
+    let dummy = system('git clone --depth=1 ' . g:ZFVimrcUtil_git_repo . ' "' . tmp_path . '"')
     let dummy = system('cp "' . tmp_path . '/' . g:ZFVimrcUtil_vimrc_file . '" "' . $HOME . '/' . g:ZFVimrcUtil_vimrc_file . '"')
     let dummy = system('rm -rf "' . tmp_path . '"')
     if confirm!='a' && confirm!='f'
@@ -123,7 +123,7 @@ function! ZF_VimrcPush()
     echo 'updating...'
     let tmp_path = $HOME . '/.vim_cache/_zf_vimrc_tmp_'
     let dummy = system('rm -rf "' . tmp_path . '"')
-    let dummy = system('git clone ' . g:ZFVimrcUtil_git_repo . ' "' . tmp_path . '"')
+    let dummy = system('git clone --depth=1 ' . g:ZFVimrcUtil_git_repo . ' "' . tmp_path . '"')
     let dummy = system('cp "' . $HOME . '/' . g:ZFVimrcUtil_vimrc_file . '" "' . tmp_path . '/' . g:ZFVimrcUtil_vimrc_file . '"')
     let dummy = system('git -C "' . tmp_path . '" config user.email "' . g:zf_git_user_email . '"')
     let dummy = system('git -C "' . tmp_path . '" config user.name "' . g:zf_git_user_name . '"')
