@@ -78,6 +78,8 @@ function! ZF_VimrcUpdate()
 
     if confirm=='f'
         let dummy = system('rm -rf "' . $HOME . '/.vim"')
+        redraw!
+        echo 'cleaning old plugins...'
     endif
 
     redraw!
