@@ -91,7 +91,7 @@ function! ZF_VimrcUpdate()
     let dummy = system('rm -rf "' . tmp_path . '"')
     if confirm!='a' && confirm!='f'
         call ZF_VimrcEdit()
-        return ;
+        return
     endif
 
     call ZF_VimrcLoad()
