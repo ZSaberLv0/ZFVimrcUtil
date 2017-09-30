@@ -41,6 +41,8 @@ function! ZF_VimClean()
     set viminfo=
     let dummy = system('rm -rf "' . $HOME . '/_viminfo"')
     let dummy = system('rm -rf "' . $HOME . '/.viminfo"')
+    let dummy = system('rm -rf "' . $HOME . '/_viminf*"')
+    let dummy = system('rm -rf "' . $HOME . '/.viminf*"')
     let dummy = system('rm -rf "' . $HOME . '/.vim_cache"')
 endfunction
 
