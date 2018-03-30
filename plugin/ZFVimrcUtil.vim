@@ -64,11 +64,11 @@ endfunction
 
 " update vimrc
 function! ZF_VimrcUpdate()
-    echo 'Confirm update?'
+    echo 'Confirm update? (note: local zf_vimrc.vim would be overrided)'
     echo '  (y)es'
     echo '  (n)o'
     echo '  (a)lso update plugins'
-    echo '  (f)orce update all plugins'
+    echo '  (f)orce update all plugins (remove all local plugins before update)'
     let confirm=nr2char(getchar())
     if confirm!='y' && confirm!='a' && confirm!='f'
         redraw!
