@@ -39,11 +39,11 @@ endfunction
 " cleanup vim
 function! ZF_VimClean()
     set viminfo=
-    let dummy = system('rm -rf "' . $HOME . '/_viminfo"')
-    let dummy = system('rm -rf "' . $HOME . '/.viminfo"')
-    let dummy = system('rm -rf "' . $HOME . '/_viminf*"')
-    let dummy = system('rm -rf "' . $HOME . '/.viminf*"')
-    let dummy = system('rm -rf "' . $HOME . '/.vim_cache"')
+    call system('rm -rf "' . $HOME . '/_viminf*"')
+    call system('rm -rf "' . $HOME . '/.viminf*"')
+    call delete($HOME . '/_viminfo')
+    call delete($HOME . '/.viminfo')
+    call delete($HOME . '/.vim_cache', 'rf')
 endfunction
 
 " diff vimrc
@@ -51,15 +51,31 @@ function! ZF_VimrcDiff()
     redraw!
     echo 'updating...'
     let tmp_path = $HOME . '/.vim_cache/_zf_vimrc_tmp_'
-    let dummy = system('rm -rf "' . tmp_path . '"')
-    let dummy = system('git clone --depth=1 ' . g:ZFVimrcUtil_git_repo . ' "' . tmp_path . '"')
+    call delete(tmp_path, 'rf')
+    call system('git clone --depth=1 ' . g:ZFVimrcUtil_git_repo . ' "' . tmp_path . '"')
     execute 'edit ' . tmp_path . '/' . g:ZFVimrcUtil_vimrc_file
     setlocal buftype=nofile
     let bufnr1 = bufnr('%')
     call ZF_VimrcEdit()
     let bufnr2 = bufnr('%')
-    execute ':call ZF_DiffBuffer(' . bufnr1 . ',' . bufnr2 . ')'
-    let dummy = system('rm -rf "' . tmp_path . '"')
+    execute ':call s:ZF_VimrcDiff(' . bufnr1 . ',' . bufnr2 . ')'
+    call delete(tmp_path, 'rf')
+endfunction
+function! s:ZF_VimrcDiff(b0, b1)
+    if has('gui')
+        set lines=9999 columns=9999
+    endif
+    if(has('win32') || has('win64') || has('win95') || has('win16'))
+        simalt ~x
+    endif
+    vsplit
+    execute "normal! \<c-w>h"
+    execute "b" . a:b0
+    diffthis
+    execute "normal! \<c-w>l"
+    execute "b" . a:b1
+    diffthis
+    normal! <c-w>=
 endfunction
 
 " update vimrc
@@ -79,16 +95,16 @@ function! ZF_VimrcUpdate()
     if confirm=='f'
         redraw!
         echo 'cleaning old plugins...'
-        let dummy = system('rm -rf "' . $HOME . '/.vim"')
+        call delete($HOME . '/.vim', 'rf')
     endif
 
     redraw!
     echo 'updating...'
     let tmp_path = $HOME . '/.vim_cache/_zf_vimrc_tmp_'
-    let dummy = system('rm -rf "' . tmp_path . '"')
-    let dummy = system('git clone --depth=1 ' . g:ZFVimrcUtil_git_repo . ' "' . tmp_path . '"')
-    let dummy = system('cp "' . tmp_path . '/' . g:ZFVimrcUtil_vimrc_file . '" "' . $HOME . '/' . g:ZFVimrcUtil_vimrc_file . '"')
-    let dummy = system('rm -rf "' . tmp_path . '"')
+    call delete(tmp_path, 'rf')
+    call system('git clone --depth=1 ' . g:ZFVimrcUtil_git_repo . ' "' . tmp_path . '"')
+    call s:cp(tmp_path . '/' . g:ZFVimrcUtil_vimrc_file, $HOME . '/' . g:ZFVimrcUtil_vimrc_file)
+    call delete(tmp_path, 'rf')
     if confirm!='a' && confirm!='f'
         call ZF_VimrcEdit()
         return
@@ -122,20 +138,28 @@ function! ZF_VimrcPush()
     redraw!
     echo 'updating...'
     let tmp_path = $HOME . '/.vim_cache/_zf_vimrc_tmp_'
-    let dummy = system('rm -rf "' . tmp_path . '"')
-    let dummy = system('git clone --depth=1 ' . g:ZFVimrcUtil_git_repo . ' "' . tmp_path . '"')
-    let dummy = system('cp "' . $HOME . '/' . g:ZFVimrcUtil_vimrc_file . '" "' . tmp_path . '/' . g:ZFVimrcUtil_vimrc_file . '"')
-    let dummy = system('git -C "' . tmp_path . '" config user.email "' . g:zf_git_user_email . '"')
-    let dummy = system('git -C "' . tmp_path . '" config user.name "' . g:zf_git_user_name . '"')
-    let dummy = system('git -C "' . tmp_path . '" config push.default "simple"')
-    let dummy = system('git -C "' . tmp_path . '" commit -a -m "update vimrc"')
+    call delete(tmp_path, 'rf')
+    call system('git clone --depth=1 ' . g:ZFVimrcUtil_git_repo . ' "' . tmp_path . '"')
+    call s:cp($HOME . '/' . g:ZFVimrcUtil_vimrc_file, tmp_path . '/' . g:ZFVimrcUtil_vimrc_file)
+    call system('git -C "' . tmp_path . '" config user.email "' . g:zf_git_user_email . '"')
+    call system('git -C "' . tmp_path . '" config user.name "' . g:zf_git_user_name . '"')
+    call system('git -C "' . tmp_path . '" config push.default "simple"')
+    call system('git -C "' . tmp_path . '" commit -a -m "update vimrc"')
     redraw!
     echo 'pushing...'
-    let dummy = system('git -C "' . tmp_path . '" push ' . g:ZFVimrcUtil_git_repo_head . g:zf_git_user_name . ':' . git_password . '@' . g:ZFVimrcUtil_git_repo_tail)
+    let pushResult = system('git -C "' . tmp_path . '" push ' . g:ZFVimrcUtil_git_repo_head . g:zf_git_user_name . ':' . git_password . '@' . g:ZFVimrcUtil_git_repo_tail)
     redraw!
     " strip password
-    let dummy = substitute(dummy, ':[^:]*@', '@', 'g')
-    echo dummy
-    let dummy = system('rm -rf "' . tmp_path . '"')
+    let pushResult = substitute(pushResult, ':[^:]*@', '@', 'g')
+    echo pushResult
+    call delete(tmp_path, 'rf')
+endfunction
+
+function! s:cp(from, to)
+    if(has('win32') || has('win64') || has('win95') || has('win16'))
+        call system('copy /y "' . a:from . '" "' . a:to . '"')
+    else
+        call system('cp "' . a:from . '" "' . a:to . '"')
+    endif
 endfunction
 
