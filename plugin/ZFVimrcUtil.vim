@@ -157,7 +157,7 @@ endfunction
 
 function! s:cp(from, to)
     if(has('win32') || has('win64') || has('win95') || has('win16'))
-        call system('copy /y "' . a:from . '" "' . a:to . '"')
+        call system('copy /y "' . substitute(a:from, '/', '\\', 'g') . '" "' . substitute(a:to, '/', '\\', 'g') . '"')
     else
         call system('cp "' . a:from . '" "' . a:to . '"')
     endif
