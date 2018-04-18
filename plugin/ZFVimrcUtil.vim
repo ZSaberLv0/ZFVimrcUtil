@@ -123,17 +123,21 @@ function! ZF_VimrcPush()
         echo 'g:zf_git_user_name not set'
     endif
 
-    call inputsave()
-    let git_password = input('Enter password: ')
-    if strlen(git_password) <= 1
-        redraw!
-        echo 'update canceled'
-        return
-    endif
-    call inputrestore()
+    if exists('g:zf_git_user_token') && !empty(g:zf_git_user_token)
+        let git_password = g:zf_git_user_token
+    else
+        call inputsave()
+        let git_password = input('Enter password: ')
+        if strlen(git_password) <= 1
+            redraw!
+            echo 'update canceled'
+            return
+        endif
+        call inputrestore()
 
-    " prevent password from being saved to viminfo
-    set viminfo=
+        " prevent password from being saved to viminfo
+        set viminfo=
+    endif
 
     redraw!
     echo 'updating...'
