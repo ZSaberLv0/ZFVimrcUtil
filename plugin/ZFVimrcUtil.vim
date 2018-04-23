@@ -39,11 +39,11 @@ endfunction
 " cleanup vim
 function! ZF_VimClean()
     set viminfo=
-    call system('rm -rf "' . $HOME . '/_viminf*"')
-    call system('rm -rf "' . $HOME . '/.viminf*"')
-    call delete($HOME . '/_viminfo')
-    call delete($HOME . '/.viminfo')
-    call delete($HOME . '/.vim_cache', 'rf')
+    call s:rm($HOME . '/_viminf*')
+    call s:rm($HOME . '/.viminf*')
+    call s:rm($HOME . '/_viminfo')
+    call s:rm($HOME . '/.viminfo')
+    call s:rm($HOME . '/.vim_cache')
 endfunction
 
 " diff vimrc
@@ -51,7 +51,7 @@ function! ZF_VimrcDiff()
     redraw!
     echo 'updating...'
     let tmp_path = $HOME . '/.vim_cache/_zf_vimrc_tmp_'
-    call delete(tmp_path, 'rf')
+    call s:rm(tmp_path)
     call system('git clone --depth=1 ' . g:ZFVimrcUtil_git_repo . ' "' . tmp_path . '"')
     execute 'edit ' . tmp_path . '/' . g:ZFVimrcUtil_vimrc_file
     setlocal buftype=nofile
@@ -59,7 +59,7 @@ function! ZF_VimrcDiff()
     call ZF_VimrcEdit()
     let bufnr2 = bufnr('%')
     execute ':call s:ZF_VimrcDiff(' . bufnr1 . ',' . bufnr2 . ')'
-    call delete(tmp_path, 'rf')
+    call s:rm(tmp_path)
 endfunction
 function! s:ZF_VimrcDiff(b0, b1)
     if has('gui')
@@ -95,16 +95,16 @@ function! ZF_VimrcUpdate()
     if confirm=='f'
         redraw!
         echo 'cleaning old plugins...'
-        call delete($HOME . '/.vim', 'rf')
+        call s:rm($HOME . '/.vim')
     endif
 
     redraw!
     echo 'updating...'
     let tmp_path = $HOME . '/.vim_cache/_zf_vimrc_tmp_'
-    call delete(tmp_path, 'rf')
+    call s:rm(tmp_path)
     call system('git clone --depth=1 ' . g:ZFVimrcUtil_git_repo . ' "' . tmp_path . '"')
     call s:cp(tmp_path . '/' . g:ZFVimrcUtil_vimrc_file, $HOME . '/' . g:ZFVimrcUtil_vimrc_file)
-    call delete(tmp_path, 'rf')
+    call s:rm(tmp_path)
     if confirm!='a' && confirm!='f'
         call ZF_VimrcEdit()
         return
@@ -142,7 +142,7 @@ function! ZF_VimrcPush()
     redraw!
     echo 'updating...'
     let tmp_path = $HOME . '/.vim_cache/_zf_vimrc_tmp_'
-    call delete(tmp_path, 'rf')
+    call s:rm(tmp_path)
     call system('git clone --depth=1 ' . g:ZFVimrcUtil_git_repo . ' "' . tmp_path . '"')
     call s:cp($HOME . '/' . g:ZFVimrcUtil_vimrc_file, tmp_path . '/' . g:ZFVimrcUtil_vimrc_file)
     call system('git -C "' . tmp_path . '" config user.email "' . g:zf_git_user_email . '"')
@@ -156,7 +156,7 @@ function! ZF_VimrcPush()
     " strip password
     let pushResult = substitute(pushResult, ':[^:]*@', '@', 'g')
     echo pushResult
-    call delete(tmp_path, 'rf')
+    call s:rm(tmp_path)
 endfunction
 
 function! s:cp(from, to)
@@ -164,6 +164,15 @@ function! s:cp(from, to)
         call system('copy /y "' . substitute(a:from, '/', '\\', 'g') . '" "' . substitute(a:to, '/', '\\', 'g') . '"')
     else
         call system('cp "' . a:from . '" "' . a:to . '"')
+    endif
+endfunction
+
+function! s:rm(f)
+    if(has('win32') || has('win64') || has('win95') || has('win16'))
+        call system('del /f/s/q "' . substitute(a:f, '/', '\\', 'g') . '"')
+        call system('rmdir /s/q "' . substitute(a:f, '/', '\\', 'g') . '"')
+    else
+        call system('rm -rf "' . a:f. '"')
     endif
 endfunction
 
