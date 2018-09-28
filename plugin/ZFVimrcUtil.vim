@@ -204,7 +204,7 @@ endfunction
 function! ZF_VimrcAutoUpdateMarkFinish()
     call writefile([localtime()], g:ZFVimrcUtil_AutoUpdateIntervalFile)
 endfunction
-function! ZF_VimrcAutoUpdate()
+function! ZF_VimrcAutoUpdate(...)
     if g:ZFVimrcUtil_AutoUpdateInterval <= 0
         return
     endif
@@ -222,9 +222,9 @@ function! ZF_VimrcAutoUpdate()
 
     if g:ZFVimrcUtil_AutoUpdateConfirm
         redraw!
-        echo '[ZFVimrcUtil] you have not update for a long time, perform update now? (y)es / (n)o'
+        echo '[ZFVimrcUtil] you have not update for a long time, update now? y/n: '
         let confirm=nr2char(getchar())
-        if confirm!='y' && confirm!='a' && confirm!='f'
+        if confirm!='y'
             redraw!
             echo '[ZFVimrcUtil] update canceled'
             return
@@ -236,12 +236,19 @@ function! ZF_VimrcAutoUpdate()
     endif
     call ZF_VimrcUpdate('a')
 endfunction
+function! s:ZF_VimrcAutoUpdateCheck()
+    if has('timers')
+        call timer_start(200, 'ZF_VimrcAutoUpdate')
+    else
+        call ZF_VimrcAutoUpdate()
+    endif
+endfunction
 augroup ZF_VimrcAutoUpdate_augroup
     autocmd!
     if exists('v:vim_did_enter') && v:vim_did_enter
-        call ZF_VimrcAutoUpdate()
+        call s:ZF_VimrcAutoUpdateCheck()
     else
-        autocmd VimEnter * call ZF_VimrcAutoUpdate()
+        autocmd VimEnter * call s:ZF_VimrcAutoUpdateCheck()
     endif
 augroup END
 
