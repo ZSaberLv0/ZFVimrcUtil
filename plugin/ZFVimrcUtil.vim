@@ -10,6 +10,22 @@ if !exists('g:ZFVimrcUtil_PluginUpdateCmd')
     let g:ZFVimrcUtil_PluginUpdateCmd='PlugUpdate'
 endif
 
+if !exists('g:ZFVimrcUtil_PluginCleanCmd')
+    let g:ZFVimrcUtil_PluginCleanCmd='PlugClean!'
+endif
+
+if !exists('g:ZFVimrcUtil_AutoUpdateInterval')
+    let g:ZFVimrcUtil_AutoUpdateInterval=2592000
+endif
+
+if !exists('g:ZFVimrcUtil_AutoUpdateConfirm')
+    let g:ZFVimrcUtil_AutoUpdateConfirm=1
+endif
+
+if !exists('g:ZFVimrcUtil_AutoUpdateIntervalFile')
+    let g:ZFVimrcUtil_AutoUpdateIntervalFile=$HOME . '/.vim_cache/ZFVimrcLastUpdate'
+endif
+
 if !exists('g:ZFVimrcUtil_vimrc_file')
     let g:ZFVimrcUtil_vimrc_file='zf_vimrc.vim'
 endif
@@ -49,7 +65,7 @@ endfunction
 " diff vimrc
 function! ZF_VimrcDiff()
     redraw!
-    echo 'updating...'
+    echo '[ZFVimrcUtil] updating...'
     let tmp_path = $HOME . '/.vim_cache/_zf_vimrc_tmp_'
     call s:rm(tmp_path)
     call system('git clone --depth=1 ' . g:ZFVimrcUtil_git_repo . ' "' . tmp_path . '"')
@@ -79,27 +95,30 @@ function! s:ZF_VimrcDiff(b0, b1)
 endfunction
 
 " update vimrc
-function! ZF_VimrcUpdate()
-    echo 'Confirm update? (note: local zf_vimrc.vim would be overrided)'
-    echo '  (y)es'
-    echo '  (n)o'
-    echo '  (a)lso update plugins'
-    echo '  (f)orce update all plugins (remove all local plugins before update)'
-    let confirm=nr2char(getchar())
+function! ZF_VimrcUpdate(...)
+    let confirm = get(a:, 1, '')
+    if empty(confirm)
+        echo '[ZFVimrcUtil] Confirm update? (note: local zf_vimrc.vim would be overrided)'
+        echo '  (y)es'
+        echo '  (n)o'
+        echo '  (a)lso update plugins'
+        echo '  (f)orce update all plugins (remove all local plugins before update)'
+        let confirm=nr2char(getchar())
+    endif
     if confirm!='y' && confirm!='a' && confirm!='f'
         redraw!
-        echo 'update canceled'
+        echo '[ZFVimrcUtil] update canceled'
         return
     endif
 
     if confirm=='f'
         redraw!
-        echo 'cleaning old plugins...'
+        echo '[ZFVimrcUtil] cleaning old plugins...'
         call s:rm($HOME . '/.vim')
     endif
 
     redraw!
-    echo 'updating...'
+    echo '[ZFVimrcUtil] updating...'
     let tmp_path = $HOME . '/.vim_cache/_zf_vimrc_tmp_'
     call s:rm(tmp_path)
     call system('git clone --depth=1 ' . g:ZFVimrcUtil_git_repo . ' "' . tmp_path . '"')
@@ -130,7 +149,7 @@ function! ZF_VimrcPush()
         let git_password = input('Enter password: ')
         if strlen(git_password) <= 1
             redraw!
-            echo 'update canceled'
+            echo '[ZFVimrcUtil] update canceled'
             return
         endif
         call inputrestore()
@@ -140,7 +159,7 @@ function! ZF_VimrcPush()
     endif
 
     redraw!
-    echo 'updating...'
+    echo '[ZFVimrcUtil] updating...'
     let tmp_path = $HOME . '/.vim_cache/_zf_vimrc_tmp_'
     call s:rm(tmp_path)
     call system('git clone --depth=1 ' . g:ZFVimrcUtil_git_repo . ' "' . tmp_path . '"')
@@ -150,7 +169,7 @@ function! ZF_VimrcPush()
     call system('git -C "' . tmp_path . '" config push.default "simple"')
     call system('git -C "' . tmp_path . '" commit -a -m "update vimrc"')
     redraw!
-    echo 'pushing...'
+    echo '[ZFVimrcUtil] pushing...'
     let pushResult = system('git -C "' . tmp_path . '" push ' . g:ZFVimrcUtil_git_repo_head . g:zf_git_user_name . ':' . git_password . '@' . g:ZFVimrcUtil_git_repo_tail)
     redraw!
     " strip password
@@ -175,4 +194,47 @@ function! s:rm(f)
         call system('rm -rf "' . a:f. '"')
     endif
 endfunction
+
+" ============================================================
+" auto update
+function! ZF_VimrcAutoUpdate()
+    if g:ZFVimrcUtil_AutoUpdateInterval <= 0
+        return
+    endif
+    if filereadable(g:ZFVimrcUtil_AutoUpdateIntervalFile)
+        let lastUpdate = join(readfile(g:ZFVimrcUtil_AutoUpdateIntervalFile), '')
+        let lastUpdate = substitute(lastUpdate, '[ \t]', '', 'g')
+    else
+        let lastUpdate = 0
+    endif
+    let curTime = localtime()
+    if curTime < lastUpdate + g:ZFVimrcUtil_AutoUpdateInterval
+        return
+    endif
+    call writefile([curTime], g:ZFVimrcUtil_AutoUpdateIntervalFile)
+
+    if g:ZFVimrcUtil_AutoUpdateConfirm
+        redraw!
+        echo '[ZFVimrcUtil] you have not update for a long time, perform update now? (y)es / (n)o'
+        let confirm=nr2char(getchar())
+        if confirm!='y' && confirm!='a' && confirm!='f'
+            redraw!
+            echo '[ZFVimrcUtil] update canceled'
+            return
+        endif
+    endif
+
+    if !empty(g:ZFVimrcUtil_PluginCleanCmd)
+        execute ':silent! ' . g:ZFVimrcUtil_PluginCleanCmd
+    endif
+    call ZF_VimrcUpdate('a')
+endfunction
+augroup ZF_VimrcAutoUpdate_augroup
+    autocmd!
+    if exists('v:vim_did_enter') && v:vim_did_enter
+        call ZF_VimrcAutoUpdate()
+    else
+        autocmd VimEnter * call ZF_VimrcAutoUpdate()
+    endif
+augroup END
 
