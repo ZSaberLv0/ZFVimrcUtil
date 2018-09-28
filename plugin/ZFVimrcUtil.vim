@@ -240,9 +240,9 @@ endfunction
 function! s:ZF_VimrcAutoUpdateCheck()
     if has('timers')
         call timer_start(200, 'ZF_VimrcAutoUpdate')
-    else
-        call ZF_VimrcAutoUpdate()
+        return
     endif
+    call ZF_VimrcAutoUpdate()
 endfunction
 augroup ZF_VimrcAutoUpdate_augroup
     autocmd!
