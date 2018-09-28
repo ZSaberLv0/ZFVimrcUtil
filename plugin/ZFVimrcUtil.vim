@@ -6,6 +6,10 @@ let g:ZFVimrcUtil_loaded=1
 
 " ============================================================
 " config
+if !exists('g:ZFVimrcUtil_cachePath')
+    let g:ZFVimrcUtil_cachePath=$HOME . '/.vim_cache'
+endif
+
 if !exists('g:ZFVimrcUtil_PluginUpdateCmd')
     let g:ZFVimrcUtil_PluginUpdateCmd='PlugUpdate'
 endif
@@ -23,7 +27,7 @@ if !exists('g:ZFVimrcUtil_AutoUpdateConfirm')
 endif
 
 if !exists('g:ZFVimrcUtil_AutoUpdateIntervalFile')
-    let g:ZFVimrcUtil_AutoUpdateIntervalFile=$HOME . '/.vim_cache/ZFVimrcLastUpdate'
+    let g:ZFVimrcUtil_AutoUpdateIntervalFile=g:ZFVimrcUtil_cachePath . '/ZFVimrcLastUpdate'
 endif
 
 if !exists('g:ZFVimrcUtil_vimrc_file')
@@ -59,14 +63,14 @@ function! ZF_VimClean()
     call s:rm($HOME . '/.viminf*')
     call s:rm($HOME . '/_viminfo')
     call s:rm($HOME . '/.viminfo')
-    call s:rm($HOME . '/.vim_cache')
+    call s:rm(g:ZFVimrcUtil_cachePath)
 endfunction
 
 " diff vimrc
 function! ZF_VimrcDiff()
     redraw!
     echo '[ZFVimrcUtil] updating...'
-    let tmp_path = $HOME . '/.vim_cache/_zf_vimrc_tmp_'
+    let tmp_path = g:ZFVimrcUtil_cachePath . '/_zf_vimrc_tmp_'
     call s:rm(tmp_path)
     call system('git clone --depth=1 ' . g:ZFVimrcUtil_git_repo . ' "' . tmp_path . '"')
     execute 'edit ' . tmp_path . '/' . g:ZFVimrcUtil_vimrc_file
@@ -119,7 +123,7 @@ function! ZF_VimrcUpdate(...)
 
     redraw!
     echo '[ZFVimrcUtil] updating...'
-    let tmp_path = $HOME . '/.vim_cache/_zf_vimrc_tmp_'
+    let tmp_path = g:ZFVimrcUtil_cachePath . '/_zf_vimrc_tmp_'
     call s:rm(tmp_path)
     call system('git clone --depth=1 ' . g:ZFVimrcUtil_git_repo . ' "' . tmp_path . '"')
     call s:cp(tmp_path . '/' . g:ZFVimrcUtil_vimrc_file, $HOME . '/' . g:ZFVimrcUtil_vimrc_file)
@@ -160,7 +164,7 @@ function! ZF_VimrcPush()
 
     redraw!
     echo '[ZFVimrcUtil] updating...'
-    let tmp_path = $HOME . '/.vim_cache/_zf_vimrc_tmp_'
+    let tmp_path = g:ZFVimrcUtil_cachePath . '/_zf_vimrc_tmp_'
     call s:rm(tmp_path)
     call system('git clone --depth=1 ' . g:ZFVimrcUtil_git_repo . ' "' . tmp_path . '"')
     call s:cp($HOME . '/' . g:ZFVimrcUtil_vimrc_file, tmp_path . '/' . g:ZFVimrcUtil_vimrc_file)
