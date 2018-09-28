@@ -202,7 +202,8 @@ endfunction
 " ============================================================
 " auto update
 function! ZF_VimrcAutoUpdateMarkFinish()
-    call writefile([localtime()], g:ZFVimrcUtil_AutoUpdateIntervalFile)
+    silent! call mkdir(fnamemodify(g:ZFVimrcUtil_AutoUpdateIntervalFile, ':p:h'), 'p', '0777')
+    silent! call writefile([localtime()], g:ZFVimrcUtil_AutoUpdateIntervalFile)
 endfunction
 function! ZF_VimrcAutoUpdate(...)
     if g:ZFVimrcUtil_AutoUpdateInterval <= 0
