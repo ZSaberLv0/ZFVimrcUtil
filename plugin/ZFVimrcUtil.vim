@@ -201,6 +201,9 @@ endfunction
 
 " ============================================================
 " auto update
+function! ZF_VimrcAutoUpdateMarkFinish()
+    call writefile([localtime()], g:ZFVimrcUtil_AutoUpdateIntervalFile)
+endfunction
 function! ZF_VimrcAutoUpdate()
     if g:ZFVimrcUtil_AutoUpdateInterval <= 0
         return
@@ -215,7 +218,7 @@ function! ZF_VimrcAutoUpdate()
     if curTime < lastUpdate + g:ZFVimrcUtil_AutoUpdateInterval
         return
     endif
-    call writefile([curTime], g:ZFVimrcUtil_AutoUpdateIntervalFile)
+    call ZF_VimrcAutoUpdateMarkFinish()
 
     if g:ZFVimrcUtil_AutoUpdateConfirm
         redraw!
