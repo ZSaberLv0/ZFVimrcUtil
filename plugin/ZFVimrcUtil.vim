@@ -245,9 +245,8 @@ function! ZF_VimrcAutoUpdate(...)
 
     if g:ZFVimrcUtil_AutoUpdateConfirm
         redraw!
-        echo '[ZFVimrcUtil] you have not update for a long time, update now? y/n: '
-        let confirm=nr2char(getchar())
-        if confirm!='y'
+        let confirm=confirm("[ZFVimrcUtil] you have not update for a long time, update now?\n", "&Yes\n&No")
+        if confirm!=1
             redraw!
             echo '[ZFVimrcUtil] update canceled'
             return
