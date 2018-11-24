@@ -27,7 +27,7 @@ if !exists('g:ZFVimrcUtil_AutoUpdateInterval')
 endif
 
 if !exists('g:ZFVimrcUtil_AutoUpdateConfirm')
-    let g:ZFVimrcUtil_AutoUpdateConfirm=0
+    let g:ZFVimrcUtil_AutoUpdateConfirm=1
 endif
 
 if !exists('g:ZFVimrcUtil_AutoUpdateIntervalFile')
