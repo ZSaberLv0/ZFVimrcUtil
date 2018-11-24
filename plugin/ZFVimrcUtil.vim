@@ -118,7 +118,7 @@ function! ZF_VimrcUpdate(...)
         echo '  (f)orce update all plugins (remove all local plugins before update)'
         let confirm=nr2char(getchar())
     endif
-    if confirm!='y' && confirm!='a' && confirm!='f'
+    if confirm!='y' && confirm!='a' && confirm!='f' && confirm!='u'
         redraw!
         echo '[ZFVimrcUtil] update canceled'
         return
@@ -132,12 +132,6 @@ function! ZF_VimrcUpdate(...)
         call s:rm($HOME . '/.vim')
     endif
 
-    for module in keys(g:ZFVimrcUtil_updateCallback)
-        redraw!
-        echo '[ZFVimrcUtil] updating ' . module . '...'
-        execute 'call ' g:ZFVimrcUtil_updateCallback[module] . '()'
-    endfor
-
     redraw!
     echo '[ZFVimrcUtil] updating...'
     let tmp_path = g:ZFVimrcUtil_cachePath . '/_zf_vimrc_tmp_'
@@ -145,12 +139,26 @@ function! ZF_VimrcUpdate(...)
     call system('git clone --depth=1 ' . g:ZFVimrcUtil_git_repo . ' "' . tmp_path . '"')
     call s:cp(tmp_path . '/' . g:ZFVimrcUtil_vimrc_file, $HOME . '/' . g:ZFVimrcUtil_vimrc_file)
     call s:rm(tmp_path)
-    if confirm!='a' && confirm!='f'
+
+    for module in keys(g:ZFVimrcUtil_updateCallback)
+        redraw!
+        echo '[ZFVimrcUtil] updating ' . module . '...'
+        execute 'call ' g:ZFVimrcUtil_updateCallback[module] . '()'
+    endfor
+
+    if confirm=='y'
         call ZF_VimrcEdit()
         return
     endif
 
     call ZF_VimrcLoad()
+
+    if confirm=='u'
+        if !empty(g:ZFVimrcUtil_PluginCleanCmd)
+            execute ':silent! ' . g:ZFVimrcUtil_PluginCleanCmd
+        endif
+    endif
+
     execute ':silent! ' . g:ZFVimrcUtil_PluginUpdateCmd
 endfunction
 
@@ -249,10 +257,7 @@ function! ZF_VimrcAutoUpdate(...)
         endif
     endif
 
-    if !empty(g:ZFVimrcUtil_PluginCleanCmd)
-        execute ':silent! ' . g:ZFVimrcUtil_PluginCleanCmd
-    endif
-    call ZF_VimrcUpdate('a')
+    call ZF_VimrcUpdate('u')
 endfunction
 function! s:ZF_VimrcAutoUpdateCheck()
     if has('timers')
