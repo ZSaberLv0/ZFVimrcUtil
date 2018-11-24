@@ -190,13 +190,13 @@ function! ZF_VimrcPush()
     call s:rm(tmp_path)
     call system('git clone --depth=1 ' . g:ZFVimrcUtil_git_repo . ' "' . tmp_path . '"')
     call s:cp($HOME . '/' . g:ZFVimrcUtil_vimrc_file, tmp_path . '/' . g:ZFVimrcUtil_vimrc_file)
-    call system('git -C "' . tmp_path . '" config user.email "' . g:zf_git_user_email . '"')
-    call system('git -C "' . tmp_path . '" config user.name "' . g:zf_git_user_name . '"')
-    call system('git -C "' . tmp_path . '" config push.default "simple"')
-    call system('git -C "' . tmp_path . '" commit -a -m "update vimrc"')
+    call system('cd "' . tmp_path . '" && git config user.email "' . g:zf_git_user_email . '"')
+    call system('cd "' . tmp_path . '" && git config user.name "' . g:zf_git_user_name . '"')
+    call system('cd "' . tmp_path . '" && git config push.default "simple"')
+    call system('cd "' . tmp_path . '" && git commit -a -m "update vimrc"')
     redraw!
     echo '[ZFVimrcUtil] pushing...'
-    let pushResult = system('git -C "' . tmp_path . '" push ' . g:ZFVimrcUtil_git_repo_head . g:zf_git_user_name . ':' . git_password . '@' . g:ZFVimrcUtil_git_repo_tail)
+    let pushResult = system('cd "' . tmp_path . '" && git push ' . g:ZFVimrcUtil_git_repo_head . g:zf_git_user_name . ':' . git_password . '@' . g:ZFVimrcUtil_git_repo_tail)
     redraw!
     " strip password
     let pushResult = substitute(pushResult, ':[^:]*@', '@', 'g')
