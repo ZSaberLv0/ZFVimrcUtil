@@ -18,6 +18,10 @@ if !exists('g:ZFVimrcUtil_PluginCleanCmd')
     let g:ZFVimrcUtil_PluginCleanCmd='PlugClean!'
 endif
 
+if !exists('g:ZFVimrcUtil_updateCallback')
+    let g:ZFVimrcUtil_updateCallback={}
+endif
+
 if !exists('g:ZFVimrcUtil_AutoUpdateInterval')
     let g:ZFVimrcUtil_AutoUpdateInterval=2592000
 endif
@@ -43,6 +47,11 @@ if !exists('g:ZFVimrcUtil_git_repo_tail')
 endif
 
 let g:ZFVimrcUtil_git_repo=g:ZFVimrcUtil_git_repo_head . g:ZFVimrcUtil_git_repo_tail
+
+" ============================================================
+" functions
+command! -nargs=0 ZFPlugUpdate :call ZF_VimrcUpdate('a')
+command! -nargs=0 ZFPlugClean :execute ':silent! ' . g:ZFVimrcUtil_PluginCleanCmd
 
 " ============================================================
 " edit vimrc
@@ -115,11 +124,19 @@ function! ZF_VimrcUpdate(...)
         return
     endif
 
+    call ZF_VimrcAutoUpdateMarkFinish()
+
     if confirm=='f'
         redraw!
         echo '[ZFVimrcUtil] cleaning old plugins...'
         call s:rm($HOME . '/.vim')
     endif
+
+    for module in keys(g:ZFVimrcUtil_updateCallback)
+        redraw!
+        echo '[ZFVimrcUtil] updating ' . module . '...'
+        execute 'call ' g:ZFVimrcUtil_updateCallback[module] . '()'
+    endfor
 
     redraw!
     echo '[ZFVimrcUtil] updating...'
