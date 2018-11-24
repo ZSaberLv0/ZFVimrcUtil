@@ -175,16 +175,13 @@ function! ZF_VimrcPush()
         let git_password = g:zf_git_user_token
     else
         call inputsave()
-        let git_password = input('Enter password: ')
+        let git_password = inputsecret('Enter password: ')
         if strlen(git_password) <= 1
             redraw!
             echo '[ZFVimrcUtil] update canceled'
             return
         endif
         call inputrestore()
-
-        " prevent password from being saved to viminfo
-        set viminfo=
     endif
 
     redraw!
