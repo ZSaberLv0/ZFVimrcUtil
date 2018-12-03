@@ -196,7 +196,7 @@ function! ZF_VimrcPush()
     call system('cd "' . tmp_path . '" && git commit -a -m "update vimrc"')
     redraw!
     echo '[ZFVimrcUtil] pushing...'
-    let pushResult = system('cd "' . tmp_path . '" && git push ' . g:ZFVimrcUtil_git_repo_head . g:zf_git_user_name . ':' . git_password . '@' . g:ZFVimrcUtil_git_repo_tail)
+    let pushResult = system('cd "' . tmp_path . '" && git push ' . g:ZFVimrcUtil_git_repo_head . g:zf_git_user_name . ':' . git_password . '@' . g:ZFVimrcUtil_git_repo_tail . ' HEAD')
     redraw!
     " strip password
     let pushResult = substitute(pushResult, ':[^:]*@', '@', 'g')
