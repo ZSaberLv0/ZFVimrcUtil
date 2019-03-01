@@ -7,7 +7,11 @@ let g:ZFVimrcUtil_loaded=1
 " ============================================================
 " config
 if !exists('g:ZFVimrcUtil_cachePath')
-    let g:ZFVimrcUtil_cachePath=$HOME . '/.vim_cache'
+    if exists('g:zf_vim_cache_path')
+        let g:ZFVimrcUtil_cachePath=g:zf_vim_cache_path
+    else
+        let g:ZFVimrcUtil_cachePath=$HOME . '/.vim_cache'
+    endif
 endif
 
 if !exists('g:ZFVimrcUtil_PluginUpdateCmd')
