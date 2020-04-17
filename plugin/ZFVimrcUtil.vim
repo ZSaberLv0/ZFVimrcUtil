@@ -71,7 +71,9 @@ endfunction
 
 " cleanup vim
 function! ZF_VimClean()
-    set viminfo=
+    if has('viminfo')
+        set viminfo=
+    endif
     call s:rm($HOME . '/_viminf*')
     call s:rm($HOME . '/.viminf*')
     call s:rm($HOME . '/_viminfo')
