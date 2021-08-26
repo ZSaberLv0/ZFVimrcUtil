@@ -233,6 +233,10 @@ function! ZF_VimrcAutoUpdateMarkFinish()
     silent! call writefile([localtime()], g:ZFVimrcUtil_AutoUpdateIntervalFile)
 endfunction
 function! ZF_VimrcAutoUpdate(...)
+    if get(g:, 'ZFVimrcUtil_AutoUpdateOverride', 0)
+        call ZF_VimrcAutoUpdateMarkFinish()
+        return
+    endif
     if g:ZFVimrcUtil_AutoUpdateInterval <= 0
         return
     endif
