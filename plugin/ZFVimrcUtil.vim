@@ -7,7 +7,7 @@ let g:ZFVimrcUtil_loaded=1
 " ============================================================
 " config
 if !exists('g:ZFVimrcUtil_cachePath')
-    if exists('g:zf_vim_cache_path')
+    if !empty(get(g:, 'zf_vim_cache_path', ''))
         let g:ZFVimrcUtil_cachePath=g:zf_vim_cache_path
     else
         let g:ZFVimrcUtil_cachePath=$HOME . '/.vim_cache'
@@ -59,14 +59,30 @@ command! -nargs=0 ZFPlugClean :execute ':silent! ' . g:ZFVimrcUtil_PluginCleanCm
 
 " ============================================================
 " edit vimrc
+function! s:home()
+    return get(g:, 'zf_vim_home_path', $HOME)
+endfunction
+function! s:vimrcPath()
+    return get(g:, 'zf_vimrc_path',
+                \ get(g:, 'ZFVimrcUtil_vimrc_path', s:home()) . '/' . g:ZFVimrcUtil_vimrc_file
+                \ )
+endfunction
 function! ZF_VimrcLoad()
-    execute 'silent! source $HOME/' . g:ZFVimrcUtil_vimrc_file
+    execute 'silent! source ' . substitute(s:vimrcPath(), ' ', '\\ ', 'g')
 endfunction
 function! ZF_VimrcEdit()
-    execute 'edit $HOME/' . g:ZFVimrcUtil_vimrc_file
+    execute 'edit ' . substitute(s:vimrcPath(), ' ', '\\ ', 'g')
 endfunction
 function! ZF_VimrcEditOrg()
-    edit $MYVIMRC
+    let myvimrc = $MYVIMRC
+    if empty(myvimrc)
+        if (has('win32') || has('win64')) && !has('win32unix')
+            let myvimrc = s:home() . '/_vimrc'
+        else
+            let myvimrc = s:home() . '/.vimrc'
+        endif
+    endif
+    execute 'edit ' . substitute(myvimrc, ' ', '\\ ', 'g')
 endfunction
 
 " cleanup vim
@@ -74,10 +90,10 @@ function! ZF_VimClean()
     if has('viminfo')
         set viminfo=
     endif
-    call s:rm($HOME . '/_viminf*')
-    call s:rm($HOME . '/.viminf*')
-    call s:rm($HOME . '/_viminfo')
-    call s:rm($HOME . '/.viminfo')
+    call s:rm(s:home() . '/_viminf*')
+    call s:rm(s:home() . '/.viminf*')
+    call s:rm(s:home() . '/_viminfo')
+    call s:rm(s:home() . '/.viminfo')
     call s:rm(g:ZFVimrcUtil_cachePath)
 endfunction
 
@@ -135,7 +151,7 @@ function! ZF_VimrcUpdate(...)
     if confirm=='f'
         redraw!
         echo '[ZFVimrcUtil] cleaning old plugins...'
-        call s:rm($HOME . '/.vim')
+        call s:rm(s:home() . '/.vim')
     endif
 
     redraw!
@@ -143,7 +159,7 @@ function! ZF_VimrcUpdate(...)
     let tmp_path = g:ZFVimrcUtil_cachePath . '/_zf_vimrc_tmp_'
     call s:rm(tmp_path)
     call system('git clone --depth=1 ' . g:ZFVimrcUtil_git_repo . ' "' . tmp_path . '"')
-    call s:cp(tmp_path . '/' . g:ZFVimrcUtil_vimrc_file, $HOME . '/' . g:ZFVimrcUtil_vimrc_file)
+    call s:cp(tmp_path . '/' . g:ZFVimrcUtil_vimrc_file, s:vimrcPath())
     call s:rm(tmp_path)
 
     for module in keys(g:ZFVimrcUtil_updateCallback)
@@ -195,7 +211,7 @@ function! ZF_VimrcPush()
     let tmp_path = g:ZFVimrcUtil_cachePath . '/_zf_vimrc_tmp_'
     call s:rm(tmp_path)
     call system('git clone --depth=1 ' . g:ZFVimrcUtil_git_repo . ' "' . tmp_path . '"')
-    call s:cp($HOME . '/' . g:ZFVimrcUtil_vimrc_file, tmp_path . '/' . g:ZFVimrcUtil_vimrc_file)
+    call s:cp(s:vimrcPath(), tmp_path . '/' . g:ZFVimrcUtil_vimrc_file)
     call system('cd "' . tmp_path . '" && git config user.email "' . g:zf_git_user_email . '"')
     call system('cd "' . tmp_path . '" && git config user.name "' . g:zf_git_user_name . '"')
     call system('cd "' . tmp_path . '" && git commit -a -m "update vimrc"')
