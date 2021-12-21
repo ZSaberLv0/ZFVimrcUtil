@@ -42,15 +42,9 @@ if !exists('g:ZFVimrcUtil_vimrc_file')
     let g:ZFVimrcUtil_vimrc_file='zf_vimrc.vim'
 endif
 
-if !exists('g:ZFVimrcUtil_git_repo_head')
-    let g:ZFVimrcUtil_git_repo_head='https://'
+if !exists('g:ZFVimrcUtil_git_repo')
+    let g:ZFVimrcUtil_git_repo = get(g:, 'zf_githost', 'https://github.com') . '/ZSaberLv0/zf_vimrc.vim'
 endif
-
-if !exists('g:ZFVimrcUtil_git_repo_tail')
-    let g:ZFVimrcUtil_git_repo_tail='github.com/ZSaberLv0/zf_vimrc.vim'
-endif
-
-let g:ZFVimrcUtil_git_repo=g:ZFVimrcUtil_git_repo_head . g:ZFVimrcUtil_git_repo_tail
 
 " ============================================================
 " functions
@@ -193,6 +187,15 @@ function! ZF_VimrcPush()
         echo 'g:zf_git_user_name not set'
     endif
 
+    let prefixPos = match(g:ZFVimrcUtil_git_repo, '://')
+    if prefixPos < 0
+        echo '[ZFVimrcUtil] invalid git repo: ' . g:ZFVimrcUtil_git_repo
+        return
+    endif
+    let prefixPos += strlen('://')
+    let ZFVimrcUtil_git_repo_head = strpart(g:ZFVimrcUtil_git_repo, 0, prefixPos)
+    let ZFVimrcUtil_git_repo_tail = strpart(g:ZFVimrcUtil_git_repo, prefixPos)
+
     if exists('g:zf_git_user_token') && !empty(g:zf_git_user_token)
         let git_password = g:zf_git_user_token
     else
@@ -217,7 +220,11 @@ function! ZF_VimrcPush()
     call system('cd "' . tmp_path . '" && git commit -a -m "update vimrc"')
     redraw!
     echo '[ZFVimrcUtil] pushing...'
-    let pushResult = system('cd "' . tmp_path . '" && git push ' . g:ZFVimrcUtil_git_repo_head . g:zf_git_user_name . ':' . git_password . '@' . g:ZFVimrcUtil_git_repo_tail . ' HEAD')
+    if match(g:ZFVimrcUtil_git_repo, '^ssh://') >= 0
+        let pushResult = system('cd "' . tmp_path . '" && git push ' . g:ZFVimrcUtil_git_repo . ' HEAD')
+    else
+        let pushResult = system('cd "' . tmp_path . '" && git push ' . ZFVimrcUtil_git_repo_head . g:zf_git_user_name . ':' . git_password . '@' . ZFVimrcUtil_git_repo_tail . ' HEAD')
+    endif
     redraw!
     " strip password
     let pushResult = substitute(pushResult, ':[^:]*@', '@', 'g')
