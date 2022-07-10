@@ -70,7 +70,7 @@ endfunction
 function! ZF_VimrcEditOrg()
     let myvimrc = $MYVIMRC
     if empty(myvimrc)
-        if (has('win32') || has('win64')) && !has('win32unix')
+        if has('windows') && !has('win32unix')
             let myvimrc = s:home() . '/_vimrc'
         else
             let myvimrc = s:home() . '/.vimrc'
@@ -110,7 +110,7 @@ function! s:ZF_VimrcDiff(b0, b1)
     if has('gui')
         set lines=9999 columns=9999
     endif
-    if(has('win32') || has('win64') || has('win95') || has('win16'))
+    if has('windows')
         simalt ~x
     endif
     vsplit
@@ -233,7 +233,7 @@ function! ZF_VimrcPush()
 endfunction
 
 function! s:cp(from, to)
-    if(has('win32') || has('win64') || has('win95') || has('win16'))
+    if has('windows')
         call system('copy /y "' . substitute(a:from, '/', '\\', 'g') . '" "' . substitute(a:to, '/', '\\', 'g') . '"')
     else
         call system('cp "' . a:from . '" "' . a:to . '"')
@@ -241,7 +241,7 @@ function! s:cp(from, to)
 endfunction
 
 function! s:rm(f)
-    if(has('win32') || has('win64') || has('win95') || has('win16'))
+    if has('windows')
         call system('del /f/s/q "' . substitute(a:f, '/', '\\', 'g') . '"')
         call system('rmdir /s/q "' . substitute(a:f, '/', '\\', 'g') . '"')
     else
