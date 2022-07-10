@@ -70,7 +70,7 @@ endfunction
 function! ZF_VimrcEditOrg()
     let myvimrc = $MYVIMRC
     if empty(myvimrc)
-        if has('windows') && !has('win32unix')
+        if has('windows') && !has('unix')
             let myvimrc = s:home() . '/_vimrc'
         else
             let myvimrc = s:home() . '/.vimrc'
@@ -110,7 +110,7 @@ function! s:ZF_VimrcDiff(b0, b1)
     if has('gui')
         set lines=9999 columns=9999
     endif
-    if has('windows')
+    if has('windows') && !has('unix')
         simalt ~x
     endif
     vsplit
